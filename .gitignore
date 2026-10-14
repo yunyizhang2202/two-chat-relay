@@ -1,12 +1,21 @@
-node_modules/
-*.log
+# Environment / editor
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 __pycache__/
-.pytest_cache/
+*.pyc
+node_modules/
+*.log
+
+# Local testing data and sensitive output
+*.har
+*.trace
 .env
 .env.*
-!.env.example
+!/.env.example
 local-data/
-coverage/
-dist/
+chat-exports/
+
+# Distributable packages
+*.zip

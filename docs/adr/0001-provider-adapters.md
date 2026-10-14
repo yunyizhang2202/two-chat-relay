@@ -1,9 +1,21 @@
-# ADR 0001 — Provider adapters
+# ADR-0001 — Keep the v1.0 relay engine as baseline; introduce site adapters
 
-**Status:** Proposed. Date: 2026-10-14.
+Date: 2026-10-14  
+Status: **Proposed; not yet implemented**
 
-Current v1.0 is a Chrome / ChatGPT-only proof of concept. Websites have different DOMs and editing mechanisms. For DeepSeek we will keep the existing relay state machine and introduce independent site adapters with operations such as `matchesUrl`, `readTurns`, `isGenerating`, `getComposer`, `send`, `confirmSend`.
+## Context
 
-Requirements: preserve baseline tests; stable message identity over DOM remount; prevent duplicate sends; confirm message fidelity after formatting; fail closed on uncertainty; minimal per-host permissions.
+`background.js` and `popup.js` currently hard-code `https://chatgpt.com/` and ChatGPT conversation URL readiness; `content.js` assumes ChatGPT conversation DOM and composer. Mixing DeepSeek selectors directly into these functions risks breaking the working baseline.
 
-Do not use hidden backend endpoints, cookies or network interception to bypass site behavior. Implement in a feature branch, and merge only after test evidence.
+## Decision proposed
+
+- Preserve v1.0.0 as the ChatGPT-only baseline (tagging and release on GitHub when available).
+- Define a small provider interface: `matchUrl`, `isConversationReady`, `listUserTurns`, `listAssistantTurns`, `getStableTurnId`, `extractText`, `isGenerating`, `insertPrompt`, `submitPrompt`, `confirmSent`.
+- Add `providers/chatgpt` and `providers/deepseek` behind an explicit provider detector, keeping transport/state-machine semantics unchanged.
+- Default new adapters to **read-only diagnostics**, enabling send only after correct per-provider verification tests.
+- Grant site-specific permissions only for supported providers; avoid `<all_urls>`, blanket content injection, network interception and undocumented backend calls.
+- Do not retry unknown sends automatically. Preserve cross-provider delivery checks and fail-closed behavior.
+
+## Consequences
+
+Adds some structure but should simplify maintenance and enable site-to-site conversations (ChatGPT ↔ DeepSeek). Site changes may still break adapters. No claims of DeepSeek support until exercised with real pages and terms reviewed.

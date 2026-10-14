@@ -1,17 +1,15 @@
-# Development log / 开发日志
+# Development log / 开发留痕
 
-## 2026-10-14 — v1.0 baseline
-- Created public repository and prepared bilingual documentation, MIT license, and project issues.
-- Established a frozen baseline derived from the previously tested v0.13 Chrome-only extension.
-- Re-ran 63 Node core tests locally: **63 passed, 0 failed**.
-- Not yet claimed to support DeepSeek. Future work tracked by #1–#4.
-- Upload status: repository files are being synced from the locally prepared v1.0 source package.
+## 2026-10-14 — v1.0.0 public baseline prepared
 
-## Milestones
-1. Read-only DeepSeek DOM diagnostic (#1)
-2. Modular adapter contract (#2)
-3. Live two-way ChatGPT ↔ DeepSeek testing (#3)
-4. Background and minimized Chrome regression (#4)
+**Source**: local v0.13 package used as baseline. User feedback indicates previous ChatGPT↔ChatGPT relay and v0.12 long-text flows worked; v0.13 UI was accepted for publication. These are *user reports*, not an independently reproduced signed-in end-to-end run in this environment.
 
-## Evidence policy
-Differentiate researched hypotheses, local simulated tests, and real-browser validation. Never publish personal chat transcripts, API keys or account tokens.
+**Frozen behavior**: select two existing ChatGPT conversations; manual/autonomous/free start; finite/unlimited rounds; length policies; uncertain delivery pauses; no model APIs.
+
+**Change for release**: documentation, MIT license, privacy review, version bump from 0.13.0 to 1.0.0; no modifications to `background.js`, `content.js`, or `relay_core.js`.
+
+**Next research**: DeepSeek (`https://chat.deepseek.com`) provider adapter. Research must not be construed as implemented support.
+
+**Review gates before cross-provider merge**: new-provider read-only probe, role and identity extraction, long text maths, send confirmation, background tab and restart behavior, terms/permissions review.
+
+Reference docs: [DeepSeek adapter](research/deepseek-adapter.md), [architecture decision ADR-0001](adr/0001-provider-adapters.md).

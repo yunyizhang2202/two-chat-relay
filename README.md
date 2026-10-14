@@ -1,11 +1,9 @@
 # Two-Chat Relay / AI 对话接力
 
-> **Repository migration in progress:** Core extension scripts have not yet been uploaded. Please use the complete source package until the remaining files are synced. The installed extension will not work from this partial repository snapshot.
-
 **A local Chrome extension that relays messages between two selected ChatGPT tabs. No API key required.**  
 **一个免费的 Chrome 扩展，让两个已打开的 ChatGPT 聊天标签页自动轮流交流，无须模型 API Key。**
 
-
+![Popup UI](docs/screenshots/ui-preview.png)
 
 > **v1.0.0 — ChatGPT-only baseline / ChatGPT 基线版**  
 > Multi-provider support (e.g. DeepSeek) is **research only**, not implemented in v1.0.0.  
