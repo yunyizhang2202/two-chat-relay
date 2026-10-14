@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 对话接力</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-icon" aria-hidden="true">↔</div>
+    <div class="brand-copy">
+      <h1>AI 对话接力</h1>
+      <p>让两个 AI 自动聊起来</p>
+    </div>
+    <span class="version">v1.0.0</span>
+  </header>
+
+  <main>
+    <section class="panel" aria-labelledby="chooseTitle">
+      <div class="section-head">
+        <h2 id="chooseTitle"><span class="step">1</span> 选择两个聊天</h2>
+        <button id="refresh" type="button" class="inline-action">↻ 刷新</button>
+      </div>
+      <label for="a" class="field-label">第一个 AI <span>从这里开始</span></label>
+      <select id="a" aria-label="第一个 AI 的聊天标签页"></select>
+      <div class="swap-line">
+        <span class="swap-rule"></span>
+        <button id="swap" type="button" class="swap-btn" title="交换两个聊天" aria-label="交换 A 和 B">⇅ <span>交换</span></button>
+        <span class="swap-rule"></span>
+      </div>
+      <label for="b" class="field-label">第二个 AI <span>接收并回复</span></label>
+      <select id="b" aria-label="第二个 AI 的聊天标签页"></select>
+      <p id="tabTip" class="footnote" role="status">两个聊天页需先各完成一次问答。</p>
+    </section>
+
+    <section class="panel" aria-labelledby="setupTitle">
+      <div class="section-head"><h2 id="setupTitle"><span class="step">2</span> 设置交流</h2></div>
+      <label for="mode" class="field-label">怎样开始？</label>
+      <select id="mode">
+        <option value="free" selected>AI 自由开场 · 不限定话题和语言</option>
+        <option value="autonomous">AI 自选话题 · 中文引导</option>
+        <option value="manual">我先说一句 · 手动开场</option>
+      </select>
+      <p id="modeHelp" class="footnote">点击开始后，AI 会自己决定聊什么。</p>
+
+      <label for="limit" class="field-label space-top">聊多少次？ <span>一次传递算一次</span></label>
+      <div class="limit-row">
+        <input id="limit" inputmode="numeric" type="number" value="1000" min="0" step="1" aria-describedby="limitTip">
+        <span class="unit">次</span>
+      </div>
+      <div class="quick-presets" role="group" aria-label="快捷设置转发次数">
+        <button type="button" class="preset" data-limit="10">10 次</button>
+        <button type="button" class="preset" data-limit="100">100 次</button>
+        <button type="button" class="preset" data-limit="1000">1000 次</button>
+        <button type="button" class="preset" data-limit="0">∞ 不限</button>
+      </div>
+      <p id="limitTip" class="footnote">可输入任意非负整数；0 表示不限次数。</p>
+    </section>
+
+    <div class="actions">
+      <button id="start" type="button" class="primary"><span aria-hidden="true">▶</span> 开始聊天</button>
+      <button id="stop" type="button" class="secondary">■ 停止</button>
+    </div>
+
+    <section class="status" aria-live="polite" aria-atomic="false">
+      <div class="status-top">
+        <span id="light" class="light" aria-hidden="true"></span>
+        <strong id="headline">准备就绪</strong>
+        <span id="counter" class="counter">尚未开始</span>
+      </div>
+      <p id="detail" class="status-detail">选好两个聊天，点击开始。</p>
+      <div id="progressTrack" class="progress-track" hidden><div id="progressFill" class="progress-fill"></div></div>
+    </section>
+
+    <details id="advanced" class="advanced">
+      <summary>高级设置与问题排查 <span aria-hidden="true">⌄</span></summary>
+      <div class="advanced-body">
+        <label for="lengthPolicy" class="field-label">回复长度</label>
+        <select id="lengthPolicy">
+          <option value="free">完全自由 · 不限制正常回复长度</option>
+          <option value="concise">自然简洁 · 尽量说重点</option>
+          <option value="cap">设置上限 · 过长时暂停</option>
+        </select>
+        <p id="lengthHelp" class="footnote">完整转发，不擅自截断。</p>
+        <div id="capControl" hidden>
+          <label for="lengthCap" class="field-label">每条消息最多多少字符？</label>
+          <input id="lengthCap" type="number" min="100" max="200000" value="8000" step="100">
+        </div>
+        <div class="tools">
+          <button id="diagnose" type="button" class="tool-button">查看诊断信息</button>
+          <button id="demo" type="button" class="tool-button">打开模拟聊天</button>
+        </div>
+        <pre id="diagnostic" class="diagnostic" hidden></pre>
+        <p class="legal-note">不会额外上传聊天内容；发送状态不确定时自动暂停且不重复发送。无限模式也可能因网站限制或标签页冻结而中断。真实网页自动化可能受到服务条款限制。</p>
+      </div>
+    </details>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
