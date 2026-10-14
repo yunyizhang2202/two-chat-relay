@@ -1,36 +1,67 @@
-name: Expand verified v1 baseline source archive
+name: Import verified Two-Chat Relay v1.0.0 source
 on:
   push:
     branches: [main]
     paths:
-      - 'packages/v1.0.0-chrome.zip'
+      - 'two-chat-relay-v1.0.0-source.zip'
+
 permissions:
   contents: write
+
 jobs:
-  unpack:
+  import-source:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Extract exact allowlisted extension files
+      - name: Verify and extract project source
         run: |
           python3 - <<'PY'
-          from pathlib import Path
+          from pathlib import Path, PurePosixPath
+          from hashlib import sha256
           from zipfile import ZipFile
-          allowed={'background.js','content.js','relay_core.js','popup.js','style.css','demo.js'}
-          archive=Path('packages/v1.0.0-chrome.zip')
+          archive = Path('two-chat-relay-v1.0.0-source.zip')
+          expected = '8db2623baa321baef69714b727b427ce7fa9c910aff8971d8745ec76a57d7b19'
+          if sha256(archive.read_bytes()).hexdigest() != expected:
+              raise SystemExit('This is not the reviewed v1.0.0 source archive; refusing to extract.')
+          root = Path.cwd().resolve()
           with ZipFile(archive) as z:
-              names=set(z.namelist())
-              if not allowed.issubset(names):
-                  raise RuntimeError('Missing required baseline files')
-              for name in sorted(allowed):
-                  Path(name).write_bytes(z.read(name))
+              names = set(z.namelist())
+              required = {
+                  'two-chat-relay/manifest.json',
+                  'two-chat-relay/background.js',
+                  'two-chat-relay/content.js',
+                  'two-chat-relay/relay_core.js',
+                  'two-chat-relay/popup.js',
+                  'two-chat-relay/style.css',
+                  'two-chat-relay/README.md',
+              }
+              if not required.issubset(names):
+                  raise SystemExit('Required source files are missing.')
+              for item in z.infolist():
+                  if item.is_dir():
+                      continue
+                  original = PurePosixPath(item.filename)
+                  if len(original.parts) < 2 or original.parts[0] != 'two-chat-relay':
+                      raise SystemExit('Unexpected archive entry')
+                  relative = PurePosixPath(*original.parts[1:])
+                  if relative.is_absolute() or '..' in relative.parts:
+                      raise SystemExit('Path traversal blocked')
+                  if ((item.external_attr >> 16) & 0o170000) == 0o120000:
+                      raise SystemExit('Archive symlink blocked')
+                  target = root.joinpath(*relative.parts).resolve()
+                  if not target.is_relative_to(root) or '.git' in relative.parts or '.github' in relative.parts:
+                      raise SystemExit('Unsafe archive path blocked')
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(z.read(item))
+          print('Verified and extracted', len(names), 'entries')
           PY
-      - name: Commit baseline files
+      - name: Commit verified source and remove temporary archive
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add background.js content.js relay_core.js popup.js style.css demo.js
-          git diff --cached --quiet || git commit -m "source: expand tested v1.0 extension baseline"
+          git rm -- two-chat-relay-v1.0.0-source.zip
+          git add -A
+          git diff --cached --quiet || git commit -m "release: import verified v1.0.0 source and tests"
           git push
